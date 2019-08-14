@@ -12,6 +12,8 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Xml configuration pathes
      */
+    const XML_PATH_DEFAULT_SHIPPING_METHOD = 'checkout/easyco/default_shipping_method';
+    const XML_PATH_DEFAULT_PAYMENT_METHOD  = 'checkout/easyco/default_payment_method';
     const XML_PATH_DEFAULT_COUNTRY = 'checkout/easyco/default_country';
     const XML_PATH_DEFAULT_REGION  = 'checkout/easyco/default_region';
     const XML_PATH_DEFAULT_CITY    = 'checkout/easyco/default_city';
@@ -24,14 +26,7 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_SHOW_NEWSLETTER     = 'checkout/easyco/show_newsletter';
     const XML_PATH_NEWSLETTER_SEND_SUCCESS_EMAIL = 'checkout/easyco/newsletter_send_success';
     const XML_PATH_NEWSLETTER_SEND_REQUEST_EMAIL = 'checkout/easyco/newsletter_send_request';
-
-    protected
-        /**
-         * List of specific address fields
-         *
-         * @var array
-         */
-        $_copyAddressFields = array('country_id', 'region', 'region_id', 'city', 'postcode');
+    const XML_PATH_UPDATE_TOTALS_WHEN_PAYMENT_CHANGED = 'checkout/easyco/update_totals_when_payment_changed';
 
     /**
      * Return attribute options
@@ -50,7 +45,7 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
             ->getAllOptions($withEmpty);
 
         $set = array();
-        foreach ($data as &$row) {
+        foreach ($data as $row) {
             $set[$row['value']] = $row['label'];
         }
 
@@ -64,12 +59,15 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getDefaultShippingAddress()
     {
-        return array(
-            'country_id' => $this->getDefaultCountry(),
+        $address = array(
+            'country_id' => $this->getDefaultCountryId(),
             'region'     => $this->getDefaultRegion(),
             'region_id'  => null,
             'city'       => $this->getDefaultCity()
         );
+
+        $address['location'] = join(', ', array($address['country_id'], $address['region'], $address['city']));
+        return $this->parseLocationOf(new Varien_Object($address));
     }
 
     /**
@@ -84,21 +82,6 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
             $text = mb_convert_case($text, MB_CASE_LOWER, Mage_Core_Helper_String::ICONV_CHARSET);
         }
         return $text;
-    }
-
-    /**
-     * Copy specific fields from one address to another
-     *
-     * @param Mage_Sales_Model_Quote_Address $from
-     * @param  $to
-     * @return Mage_Sales_Model_Quote_Address
-     */
-    public function copyAddress(Mage_Sales_Model_Quote_Address $from, Mage_Sales_Model_Quote_Address $to)
-    {
-        foreach ($this->_copyAddressFields as $field) {
-            $to->setData($field, $from->getData($field));
-        }
-        return $to;
     }
 
     /**
@@ -126,7 +109,7 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    public function getDefaultCountry()
+    public function getDefaultCountryId()
     {
         return Mage::getStoreConfig(self::XML_PATH_DEFAULT_COUNTRY);
     }
@@ -202,65 +185,6 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Return address information stored in session.
-     * If session is empty, return default shipping information.
-     *
-     * @return array
-     */
-    public function getAddressInfo()
-    {
-        $session = Mage::getSingleton('customer/session');
-        $data    = $session->getShippingInfo();
-
-        return $data;
-    }
-
-    /**
-     * Update Shipping Address based on session and default config values.
-     *
-     * @param  Varien_Object $address
-     * @return Varien_Object
-     */
-    public function updateAddress(Varien_Object $address)
-    {
-        $data = $this->getAddressInfo();
-        if (!($data || $address->getCountryId() || $address->getCity())) {
-            $data = $this->getDefaultShippingAddress();
-        }
-
-        $shippingMethod = Mage::getSingleton('customer/session')->getShippingMethod();
-        if ($shippingMethod) {
-            $address->setShippingMethod($shippingMethod)
-                    ->setCollectShippingRates(true);
-        }
-
-        if (is_array($data)) {
-            $address->addData($data);
-        }
-        return $address;
-    }
-
-    /**
-     * Auto assign shipping method if there is only one available method
-     *
-     * @param Mage_Sales_Model_Quote_Address $address
-     * @return FI_Checkout_Helper_Data
-     */
-    public function autoAssignShippingMethod(Mage_Sales_Model_Quote_Address $address)
-    {
-        $rates = $address->collectShippingRates()->getGroupedAllShippingRates();
-        if (is_array($rates) && count($rates) == 1 && count(reset($rates)) == 1) {
-            $rate = reset($rates);
-            $rate = reset($rate);
-            if (is_object($rate)) {
-                $address->setShippingMethod($rate->getCode());
-            }
-        }
-        $address->setCollectShippingRates(true);
-        return $this;
-    }
-
-    /**
      * Check posibility to place order
      *
      * return bool
@@ -289,30 +213,26 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Return password based on choosen type
      *
-     * @param array $data user information
+     * @param Varien_Object $customer
      * @return string
      */
-    public function getPassword($data)
+    public function getPasswordFor(Varien_Object $customer)
     {
         $password = '';
         switch ($this->getPasswordType()) {
             case FI_Checkout_Model_Source::PASSWORD_FIELD:
-                if (!empty($data['password'])) {
-                    $password = $data['password'];
-                }
+                $passwod = $customer->getPassword();
                 break;
             case FI_Checkout_Model_Source::PASSWORD_PHONE:
-                if (!empty($data['address']['telephone'])) {
-                    $password = $data['address']['telephone'];
-                    $plen = strlen($password);
-                    if ($plen < 6) {
-                        $password .= $this->generateRandomKey(6 - $plen);
-                    }
+                $password = $customer->getAddress()->getTelephone();
+                $size = strlen($password);
+                if ($size < 6) {
+                    $password .= $this->generateRandomKey(6 - $size);
                 }
                 break;
         }
 
-        return $password ? $password : $this->generateRandomKey(8);
+        return empty($password) ? $this->generateRandomKey(8) : $password;
     }
 
     /**
@@ -425,5 +345,131 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
                 return Mage::getStoreConfig(self::XML_PATH_NEWSLETTER_SEND_SUCCESS_EMAIL);
         }
         return true;
+    }
+
+    public function explodeLocation($location)
+    {
+        if ($this->useOnlyDefaultCountry()) {
+            $location = $this->getDefaultCountryId() . ',' . $location;
+        }
+        $location = array_map('trim', explode(',', $location));
+        return $location + array_fill(0, 3, null);
+    }
+
+    /**
+     * Parse address information according to the config
+     *
+     * @param Varien_Object $address
+     * @return array
+     */
+    public function parseLocationOf(Varien_Object $address)
+    {
+        $earth  = Mage::getResourceModel('fi_checkout/countries');
+        $data   = array(
+            'country_id' => null,
+            'region'     => null,
+            'region_id'  => null,
+            'city'       => null,
+            'postcode'   => $address->getData('postcode')
+        );
+
+        if ($this->isLocationAsOneField()) {
+            list($country, $region, $city) = $this->explodeLocation($address->getData('location'));
+
+            if (!empty($country)) {
+                $data['country_id'] = $earth->getCountryCodeByName($country);
+
+                if (!empty($region)) {
+                    $data['city'] = $data['region'] = $region;
+                }
+
+                if (!empty($city)) {
+                    $data['city'] = $city;
+                }
+            }
+        } else {
+            $data['country_id'] = $address->getData('country_id');
+            $data['region'] = $address->getData('region');
+            $data['region_id'] = $address->getData('region_id');
+            $data['city']   = $address->getData('city');
+        }
+
+        if ($this->useOnlyDefaultCountry() || empty($data['country_id'])) {
+            $data['country_id'] = $this->getDefaultCountryId();
+        }
+
+        if (!empty($data['region']) && empty($data['region_id'])) {
+            $data['region_id'] = $earth->getRegionIdByName(trim($data['region']), $data['country_id']);
+            if ($data['region_id']) {
+                $data['region'] = null;
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prepare address information from request
+     *
+     * @param FI_Checkout_Model_Order $order
+     * @return array
+     */
+    public function extractAddressFrom(FI_Checkout_Model_Order $order)
+    {
+        $address = $order->assembleAddress();
+
+        if (!$order->getCustomer()->getIsLoggedIn()) {
+            $password = $this->getPasswordFor($order->getCustomer());
+            $address['customer_password'] = $password;
+            $address['confirm_password']  = $password;
+        }
+        return $address;
+    }
+
+    public function getDefaultShippingMethod()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_DEFAULT_SHIPPING_METHOD);
+    }
+
+    public function getDefaultPaymentMethod()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_DEFAULT_PAYMENT_METHOD);
+    }
+
+    public function shouldUpdateTotalsWhenPaymentChanged()
+    {
+        return Mage::getStoreConfigFlag(self::XML_PATH_UPDATE_TOTALS_WHEN_PAYMENT_CHANGED);
+    }
+
+    public function buildSessionOrder()
+    {
+        $session = Mage::getSingleton('customer/session');
+        $order   = Mage::getModel('fi_checkout/order')->setSession($session);
+        if ($order->getAddress()->isEmpty()) {
+            if ($session->isLoggedIn()) {
+                $order->setAddress($session->getCustomer()->getPrimaryShippingAddress()->getData());
+            } else {
+                $order->setAddress($this->getDefaultShippingAddress());
+            }
+        }
+
+        if (!$order->getPayment()->getMethod()) {
+            $order->setPaymentMethod($this->getDefaultPaymentMethod());
+        }
+        if (!$order->getShippingMethod()) {
+            $order->setShippingMethod($this->getDefaultShippingMethod());
+        }
+        return $order;
+    }
+
+    public function getActivePaymentMethods()
+    {
+        $methods = array();
+        foreach (Mage::getStoreConfig('payment') as $code => $config) {
+            if (Mage::getStoreConfigFlag('payment/' . $code . '/active')) {
+                $methods[$code] = $config['title'];
+            }
+        }
+        return $methods;
     }
 }

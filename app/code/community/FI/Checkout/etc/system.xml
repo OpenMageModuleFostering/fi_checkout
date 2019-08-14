@@ -18,26 +18,24 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>0</show_in_store>
                     <fields>
-<!--
                         <default_payment_method>
                             <label>Default Payment Method</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_payment_allowedmethods</source_model>
+                            <source_model>fi_checkout/source_paymentMethods</source_model>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </default_payment_method>
                         <default_shipping_method>
-                            <label>Default Payment Method</label>
+                            <label>Default Shipping Method</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_shipping_allowedmethods</source_model>
+                            <source_model>fi_checkout/source_shippingMethods</source_model>
                             <sort_order>2</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </default_shipping_method>
--->
                         <default_country translate="label">
                             <label>Default Country</label>
                             <frontend_type>select</frontend_type>
@@ -64,7 +62,7 @@
                             <show_in_store>1</show_in_store>
                         </default_city>
                         <use_default_country translate="label">
-                            <label>Checkout Only For Default Country</label>
+                            <label>Checkout only for Default Country</label>
                             <frontend_type>select</frontend_type>
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>20</sort_order>
@@ -127,6 +125,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </newsletter_send_request>
+                        <update_totals_when_payment_changed>
+                            <label>Update Totals when Payment Method is Changed</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </update_totals_when_payment_changed>
                     </fields>
                 </easyco>
             </groups>

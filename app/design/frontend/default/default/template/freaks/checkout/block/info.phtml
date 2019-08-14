@@ -3,27 +3,27 @@ $isLoggedIn = $this->getFilled() && $this->isCustomerLoggedIn();
 $prefix     = $isLoggedIn ? 'logged' : 'new';
 $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
 ?>
-<form id="<?php echo $isLoggedIn ? 'checkout-login-form' : 'new-user-form' ?>" action="<?php echo $this->getUrl('fi_order/checkout/place') ?>" method="post">
+<form id="<?php echo $isLoggedIn ? 'registered-user-form' : 'new-user-form' ?>" action="<?php echo $this->getUrl('fi_order/checkout/place') ?>" method="post" name="user_info">
     <div class="col2-set">
         <div class="col-1 user-general">
             <p class="required">* <?php echo $this->__('Required Fields') ?></p>
             <div class="field">
                 <label><?php echo $this->__('Name') ?>*</label>
-                <input type="text" class="input-text required-entry<?php echo $isLoggedIn ? ' disabled' : '' ?>" name="user[name]" value="<?php echo $this->htmlEscape($this->getCustomerName()) ?>" <?php if ($isLoggedIn): ?> disabled="disabled"<?php endif ?> <?php if ($isLoggedIn): ?> disabled="disabled"<?php endif ?> />
+                <input type="text" class="input-text required-entry<?php echo $isLoggedIn ? ' disabled' : '' ?>" name="user[name]" value="<?php echo $this->htmlEscape($this->getCustomerName()) ?>" <?php if ($isLoggedIn): ?> readonly="readonly"<?php endif ?> />
             </div>
             <div class="field relative">
                 <label><?php echo $this->__('Telephone') ?>*</label>
-                <input type="text" class="input-text required-entry<?php echo $isLoggedIn && $this->getCustomerPhone() ? ' disabled' : '' ?>" name="user[address][telephone]" value="<?php echo $this->htmlEscape($this->getCustomerPhone()) ?>" <?php if ($isLoggedIn && $this->getCustomerPhone()): ?> disabled="disabled"<?php endif ?> />
+                <input type="text" class="input-text required-entry<?php echo $isLoggedIn && $this->getCustomerPhone() ? ' disabled' : '' ?>" name="user[address][telephone]" value="<?php echo $this->htmlEscape($this->getCustomerPhone()) ?>" <?php if ($isLoggedIn && $this->getCustomerPhone()): ?> readonly="readonly"<?php endif ?> />
             </div>
             <div class="field">
                 <label><?php echo $this->__('E-mail') ?>*</label>
-                <input type="text" class="validate-email input-text required-entry<?php echo $isLoggedIn ? ' disabled' : '' ?>" name="user[email]" value="<?php echo $this->htmlEscape($this->getCustomerEmail()) ?>" <?php if ($isLoggedIn): ?> disabled="disabled"<?php endif ?> />
+                <input type="text" class="validate-email input-text required-entry<?php echo $isLoggedIn ? ' disabled' : '' ?>" name="user[email]" value="<?php echo $this->htmlEscape($this->getCustomerEmail()) ?>" <?php if ($isLoggedIn): ?> readonly="readonly"<?php endif ?> />
             </div>
             <?php if (!$isLoggedIn): ?>
                 <?php if ($this->helper('fi_checkout')->canShowPasswordField()): ?>
                 <div class="field">
                     <label><?php echo $this->helper('checkout')->__('Password') ?>*</label>
-                    <input type="password" class="input-text validate-password" name="user[password]" />
+                    <input type="password" class="input-text validate-password non-storable" name="user[password]" />
                 </div>
                 <?php elseif ($this->helper('fi_checkout')->isPasswordAsTelephone()): ?>
                     <span class="note">* <?php echo $this->__('Telephone number will be your password.') ?></span>
@@ -70,7 +70,7 @@ $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
                             <p class="help"><?php echo $this->helper('checkout')->__('Country') ?>*</p>
                         </div>
                         <div class="f-left relative hidden-select no-mr">
-                            <input type="text" name="user[address][region]" class="input-text required-entry fake-title" value="<?php echo $this->htmlEscape($this->getCustomerRegion()) ?>" />
+                            <input type="text" name="user[address][region]" class="input-text required-entry fake-title non-storable" value="<?php echo $this->htmlEscape($this->getCustomerRegion()) ?>" tabindex="-1" />
                             <?php $select = $this->getRegionBlock()->setName('user[address][region_id]') ?>
                             <?php echo $select->getHtml() ?>
                             <p class="help"><?php echo $select->getTitle()?>*</p>
@@ -78,11 +78,11 @@ $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
                     <?php endif ?>
                     <div class="clear"></div>
                     <div class="f-left">
-                        <input type="text" name="user[address][postcode]" class="input-text postcode" value="<?php echo $this->htmlEscape($this->getCustomerZip()) ?>" />
+                        <input type="text" name="user[address][postcode]" class="input-text postcode non-storable" value="<?php echo $this->htmlEscape($this->getCustomerZip()) ?>" />
                         <p class="help"><?php echo $this->helper('checkout')->__('Zip/Post') ?></p>
                     </div>
                     <div class="f-left no-mr">
-                        <input type="text" name="user[address][city]" class="input-text required-entry w-244" value="<?php echo $this->htmlEscape($this->getAddress()->getCity()) ?>" />
+                        <input type="text" name="user[address][city]" class="input-text required-entry w-244" value="<?php echo $this->htmlEscape($this->getCustomerCity()) ?>" />
                         <p class="help"><?php echo $this->helper('checkout')->__('City') ?>*</p>
                     </div>
                 </div>

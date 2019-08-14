@@ -2,7 +2,7 @@
 <div id="checkout-block" class="<?php echo $this->helper('fi_checkout')->isLocationAsOneField() ? 'join-address' : 'split-address' ?>">
     <ul class="infos-menus">
         <li <?php if (!$isLoggedIn): ?> class="current"<?php endif ?>><a href="#new-user"><?php echo $this->__('New User') ?></a></li>
-        <li <?php if ($isLoggedIn): ?> class="current"<?php endif ?>><a href="#login"><?php echo $this->__('Registered') ?></a></li>
+        <li <?php if ($isLoggedIn): ?> class="current"<?php endif ?>><a href="#<?php echo $isLoggedIn ? 'registered-user' : 'login' ?>"><?php echo $this->__('Registered') ?></a></li>
         <li class="clear"></li>
     </ul>
     <div class="clear"></div>

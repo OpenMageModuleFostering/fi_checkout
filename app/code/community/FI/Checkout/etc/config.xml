@@ -9,7 +9,7 @@
 <config>
     <modules>
         <FI_Checkout>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </FI_Checkout>
     </modules>
     <global>
@@ -75,6 +75,14 @@
                     </fi_checkout>
                 </observers>
             </checkout_type_onepage_save_order>
+            <checkout_submit_all_after>
+                <observers>
+                    <fi_checkout>
+                        <class>fi_checkout/observer</class>
+                        <method>tryToProcessOrder</method>
+                    </fi_checkout>
+                </observers>
+            </checkout_submit_all_after>
         </events>
     </frontend>
     <default>

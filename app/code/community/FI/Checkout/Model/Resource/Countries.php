@@ -68,73 +68,25 @@ class FI_Checkout_Model_Resource_Countries extends Mage_Directory_Model_Mysql4_C
      * @param int $limit
      * @return array
      */
-    public function filter($location, $limit = 15)
+    public function search($location, $limit = 15)
     {
-        $result    = array();
-        $helper    = Mage::helper('core/string');
-        $location  = explode(',', $location);
-        $location  = array_map('trim', $location);
-        $countries = Mage::app()->getLocale()
-            ->getCountryTranslationList();
+        list($countryName, $regionName, $cityName) = $location;
 
-        if (empty($location[0])) {
-            return $result;
+        if (empty($countryName)) {
+            return array();
         }
 
-        $checkoutHelper = Mage::helper('fi_checkout');
-        if (empty($location[1])) {
-            $i   = 0;
-            $exp = $checkoutHelper->lowerCase($location[0]);
-            foreach ($countries as $code => $name) {
-                $title = $checkoutHelper->lowerCase($name);
-                if ($helper->strpos($title, $exp) !== false) {
-                    $result[] = $name;
-                    $i++;
-                    if ($i == $limit) {
-                        break;
-                    }
-                }
-            }
+        if (empty($regionName)) {
+            $term = $this->_downcase($countryName);
+            return $this->_searchOverCountries($term, $limit);
         }
 
-        if (empty($result) && empty($location[2])) {
-            if (empty($location[1])) {
-                $location[1] = $location[0];
-            }
-            $location[0] = $checkoutHelper->lowerCase($location[0]);
-            $countries   = array_flip(array_map(array($checkoutHelper, 'lowerCase'), $countries));
-            if (isset($countries[$location[0]])) {
-                $countryCode = $countries[$location[0]];
-            } else {
-                $countryCode = $checkoutHelper->getDefaultCountry();
-            }
-
-            $adapter = $this->getSelect()->getAdapter();
-            $select  = $adapter->select()
-                ->from(array('r' => $this->_regionTable), 'default_name')
-                ->joinLeft(
-                    array('rn' => $this->_regionNameTable),
-                    $adapter->quote('rn.region_id = r.region_id AND locale = ?', Mage::app()->getLocale()->getLocaleCode()),
-                    array('name')
-                )
-                ->where('r.country_id = ?', $countryCode)
-                ->where('IF(name, name, default_name) LIKE ?', '%' . $location[1] . '%')
-                ->limit($limit);
-
-            $result = $adapter->fetchAll($select);
-            foreach ($result as &$row) {
-                $row = $row['name'] ? $row['name'] : $row['default_name'];
-            }
+        if (empty($cityName)) {
+            return $this->_searchOverRegions($regionName, $countryName, $limit);
         }
 
-        if (empty($result) && empty($location[3])) {
-            if (empty($location[2])) {
-               $location[2] = $location[1];
-            }
-            // city autocomplete
-        }
-
-        return $result;
+        // no autocomplete for city
+        return array();
     }
 
     /**
@@ -162,5 +114,70 @@ class FI_Checkout_Model_Resource_Countries extends Mage_Directory_Model_Mysql4_C
 
         $row = $adapter->fetchRow($select);
         return empty($row['region_id']) ? null : $row['region_id'];
+    }
+
+    public function getCountryCodeByName($countryName)
+    {
+        $countries = array_flip(array_map(array($this, '_downcase'), $this->_getAllCountries()));
+
+        $countryName = $this->_downcase($countryName);
+        if (isset($countries[$countryName])) {
+            return $countries[$countryName];
+        } else {
+            return Mage::helper('fi_checkout')->getDefaultCountryId();
+        }
+    }
+
+    protected function _searchOverCountries($term, $limit)
+    {
+        $countryNames = array();
+        $helper = Mage::helper('core/string');
+
+        $i = 0;
+        foreach ($this->_getAllCountries() as $code => $name) {
+            $title = $this->_downcase($name);
+            if ($helper->strpos($title, $term) !== false) {
+                $countryNames[] = $name;
+                $i++;
+                if ($i == $limit) {
+                    break;
+                }
+            }
+        }
+        return $countryNames;
+    }
+
+    protected function _searchOverRegions($term, $countryName, $limit)
+    {
+        $countryCode = $this->getCountryCodeByName($countryName);
+
+        $adapter = $this->getSelect()->getAdapter();
+        $select  = $adapter->select()
+            ->from(array('r' => $this->_regionTable), 'default_name')
+            ->joinLeft(
+                array('rn' => $this->_regionNameTable),
+                $adapter->quote('rn.region_id = r.region_id AND locale = ?', Mage::app()->getLocale()->getLocaleCode()),
+                array('name')
+            )
+            ->where('r.country_id = ?', $countryCode)
+            ->where('IF(name, name, default_name) LIKE ?', '%' . $term . '%')
+            ->limit($limit);
+
+        $regions = array();
+        $result = $adapter->fetchAll($select);
+        foreach ($result as $row) {
+            $regions[] = $row['name'] ? $row['name'] : $row['default_name'];
+        }
+        return $regions;
+    }
+
+    protected function _getAllCountries()
+    {
+        return Mage::app()->getLocale()->getCountryTranslationList();
+    }
+
+    private function _downcase($string)
+    {
+        return Mage::helper('fi_checkout')->lowerCase($string);
     }
 }

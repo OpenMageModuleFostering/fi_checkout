@@ -68,35 +68,4 @@ class FI_Checkout_Model_Source
             self::CHECKBOX_CHECKED   => Mage::helper('fi_checkout')->__('Visible, Checked')
         );
     }
-
-    /**
-     * Return enabled payment methods exclude "googlecheckout"
-     *
-     * @return array
-     */
-    public function getPaymentMethods()
-    {
-        $data = Mage::helper('fi_checkout')->getEnabledPaymentMethods();
-        unset($data['googlecheckout']);
-        $result = array();
-        foreach ($data as $row) {
-            $result[$row['value']] = $row['label'];
-        }
-        return $result;
-    }
-
-    /**
-     * Return enabled shipping methods exclude "googlecheckout"
-     *
-     * @return array
-     */
-    public function getShippingMethods()
-    {
-        $data = Mage::helper('fi_checkout')->getEnabledShippingCarriers();
-        $data = array_flip($data);
-        unset($data['googlecheckout']);
-        $data = array_flip($data);
-
-        return $data;
-    }
 }

@@ -3,7 +3,7 @@
     <modules>
         <FI_Checkout>
             <active>true</active>
-            <codePool>local</codePool>
+            <codePool>community</codePool>
         </FI_Checkout>
     </modules>
 </config>
