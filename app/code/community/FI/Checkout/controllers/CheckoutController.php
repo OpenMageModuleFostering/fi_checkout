@@ -283,6 +283,8 @@ class FI_Checkout_CheckoutController extends Mage_Checkout_Controller_Action
 
         $quote = $this->getOnepage()->getQuote();
         $sessionOrder = $this->_buildSessionOrder();
+        $sessionOrder->exportAddressTo($quote->getShippingAddress());
+        $sessionOrder->exportAddressTo($quote->getBillingAddress());
         $sessionOrder->exportPaymentTo($quote->getPayment());
 
         $blocks = array();
