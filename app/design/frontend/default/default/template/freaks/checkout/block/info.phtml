@@ -35,7 +35,7 @@ $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
         <div class="col-2">
             <?php if (!$this->getQuote()->getIsVirtual()): ?>
             <label class="tab-title"><?php echo $this->__('Shipping Methods') ?>*</label>
-            <div id="shipping-method-load" class="shipping-methods" data-action="<?php echo $this->getUrl('fi_order/checkout/update') ?>">
+            <div id="shipping-method-load" class="shipping-methods" data-action="<?php echo $this->getUrl('fi_order/checkout/update') ?>" data-update-sections="<?php echo $this->helper('fi_checkout')->shippingDependentSections() ?>">
                 <?php echo $this->getChildHtml('available_shipping_methods') ?>
             </div>
             <div id="shipping-method-additional-load">

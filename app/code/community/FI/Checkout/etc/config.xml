@@ -98,6 +98,8 @@
                 <show_newsletter>unchecked</show_newsletter>
                 <newsletter_send_request>1</newsletter_send_request>
                 <newsletter_send_success>1</newsletter_send_success>
+                <shipping_dependent_sections>totals</shipping_dependent_sections>
+                <payment_dependent_sections>totals</payment_dependent_sections>
             </easyco>
         </checkout>
     </default>

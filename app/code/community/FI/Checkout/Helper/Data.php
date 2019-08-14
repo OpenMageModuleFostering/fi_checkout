@@ -26,7 +26,8 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_SHOW_NEWSLETTER     = 'checkout/easyco/show_newsletter';
     const XML_PATH_NEWSLETTER_SEND_SUCCESS_EMAIL = 'checkout/easyco/newsletter_send_success';
     const XML_PATH_NEWSLETTER_SEND_REQUEST_EMAIL = 'checkout/easyco/newsletter_send_request';
-    const XML_PATH_UPDATE_TOTALS_WHEN_PAYMENT_CHANGED = 'checkout/easyco/update_totals_when_payment_changed';
+    const XML_PATH_PAYMENT_DEPENDENT_SECTIONS  = 'checkout/easyco/payment_dependent_sections';
+    const XML_PATH_SHIPPING_DEPENDENT_SECTIONS = 'checkout/easyco/shipping_dependent_sections';
 
     /**
      * Return attribute options
@@ -436,9 +437,14 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfig(self::XML_PATH_DEFAULT_PAYMENT_METHOD);
     }
 
-    public function shouldUpdateTotalsWhenPaymentChanged()
+    public function paymentDependentSections()
     {
-        return Mage::getStoreConfigFlag(self::XML_PATH_UPDATE_TOTALS_WHEN_PAYMENT_CHANGED);
+        return Mage::getStoreConfig(self::XML_PATH_PAYMENT_DEPENDENT_SECTIONS);
+    }
+
+    public function shippingDependentSections()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_SHIPPING_DEPENDENT_SECTIONS);
     }
 
     public function buildSessionOrder()

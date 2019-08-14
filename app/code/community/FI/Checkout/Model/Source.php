@@ -29,6 +29,14 @@ class FI_Checkout_Model_Source
     const CHECKBOX_CHECKED   = 'checked';
 
     /**
+     * Constants for dependent sections
+     */
+    const SECTION_NONE     = "";
+    const SECTION_TOTALS   = 'totals';
+    const SECTION_SHIPPING = 'shipping';
+    const SECTION_PAYMENT  = 'payment';
+
+    /**
      * Return a list of password types
      *
      * @return array
@@ -66,6 +74,34 @@ class FI_Checkout_Model_Source
             self::CHECKBOX_UNVISIBLE => Mage::helper('fi_checkout')->__('Not Visible'),
             self::CHECKBOX_UNCHECKED => Mage::helper('fi_checkout')->__('Visible, Unchecked'),
             self::CHECKBOX_CHECKED   => Mage::helper('fi_checkout')->__('Visible, Checked')
+        );
+    }
+
+    /**
+     * Return dependent sections of shipping method
+     *
+     * @return array
+     */
+    public function getShippingDependentSections()
+    {
+        return array(
+            self::SECTION_NONE       => Mage::helper('fi_checkout')->__('Nothing'),
+            self::SECTION_TOTALS     => Mage::helper('fi_checkout')->__('Totals'),
+            self::SECTION_TOTALS . ',' . self::SECTION_PAYMENT => Mage::helper('fi_checkout')->__('Payment Methods, Totals')
+        );
+    }
+
+    /**
+     * Return dependent sections of payment method
+     *
+     * @return array
+     */
+    public function getPaymentDependentSections()
+    {
+        return array(
+            self::SECTION_NONE       => Mage::helper('fi_checkout')->__('Nothing'),
+            self::SECTION_TOTALS     => Mage::helper('fi_checkout')->__('Totals'),
+            self::SECTION_TOTALS . ',' . self::SECTION_SHIPPING => Mage::helper('fi_checkout')->__('Shipping Methods, Totals')
         );
     }
 }

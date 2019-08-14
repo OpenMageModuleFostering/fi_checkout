@@ -1,7 +1,7 @@
 <div id="payment-methods" class="discount">
     <h2><?php echo $this->__('Choose Payment Method') ?>*</h2>
     <div>
-        <div id="payment-form" data-action="<?php echo $this->getUrl('fi_order/checkout/update') ?>" data-update-totals="<?php echo $this->helper('fi_checkout')->shouldUpdateTotalsWhenPaymentChanged() ?>">
+        <div id="payment-form" data-action="<?php echo $this->getUrl('fi_order/checkout/update') ?>" data-update-sections="<?php echo $this->helper('fi_checkout')->paymentDependentSections() ?>">
             <?php echo $this->getChildHtml('methods') ?>
         </div>
     </div>
