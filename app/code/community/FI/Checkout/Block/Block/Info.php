@@ -272,4 +272,9 @@ class FI_Checkout_Block_Block_Info extends Mage_Checkout_Block_Onepage_Abstract
 
         return $select;
     }
+
+    public function getSecureUrl($path)
+    {
+        return $this->getUrl($path, array('_secure' => true));
+    }
 }

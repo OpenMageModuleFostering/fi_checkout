@@ -3,7 +3,7 @@ $isLoggedIn = $this->getFilled() && $this->isCustomerLoggedIn();
 $prefix     = $isLoggedIn ? 'logged' : 'new';
 $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
 ?>
-<form id="<?php echo $isLoggedIn ? 'registered-user-form' : 'new-user-form' ?>" action="<?php echo $this->getUrl('fi_order/checkout/place') ?>" method="post" name="user_info">
+<form id="<?php echo $isLoggedIn ? 'registered-user-form' : 'new-user-form' ?>" action="<?php echo $this->helper('fi_checkout')->getPlaceUrl() ?>" method="post" name="user_info">
     <div class="col2-set">
         <div class="col-1 user-general">
             <p class="required">* <?php echo $this->__('Required Fields') ?></p>
@@ -35,7 +35,7 @@ $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
         <div class="col-2">
             <?php if (!$this->getQuote()->getIsVirtual()): ?>
             <label class="tab-title"><?php echo $this->__('Shipping Methods') ?>*</label>
-            <div id="shipping-method-load" class="shipping-methods" data-action="<?php echo $this->getUrl('fi_order/checkout/update') ?>" data-update-sections="<?php echo $this->helper('fi_checkout')->shippingDependentSections() ?>">
+            <div id="shipping-method-load" class="shipping-methods" data-action="<?php echo $this->helper('fi_checkout')->getUpdateUrl() ?>" data-update-sections="<?php echo $this->helper('fi_checkout')->shippingDependentSections() ?>">
                 <?php echo $this->getChildHtml('available_shipping_methods') ?>
             </div>
             <div id="shipping-method-additional-load">
@@ -56,7 +56,7 @@ $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
                     <input type="text" name="user[address][postcode]" class="input-text postcode w-30" value="<?php echo $this->htmlEscape($this->getCustomerZip()) ?>" />
                     <p class="help"><?php echo $this->helper('checkout')->__('Zip/Post') ?></p>
                 </div>
-                <div class="f-left no-mr" data-action="<?php echo $this->getUrl('fi_order/checkout/locationAutocomplete') ?>">
+                <div class="f-left no-mr" data-action="<?php echo $this->getSecureUrl('fi_order/checkout/locationAutocomplete') ?>">
                     <input id="<?php echo $prefix ?>_user_location" type="text" class="input-select input-text required-entry" name="user[address][location]" value="<?php echo $this->htmlEscape($this->getCustomerLocation()) ?>" />
                     <a href="#" class="select-tip" tabindex="-1"></a>
                     <div id="<?php echo $prefix ?>_user_loc_update" class="autocomplete"></div>
@@ -65,7 +65,7 @@ $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
                 <?php else: ?>
                 <div class="f-left loc-diff-fields">
                     <?php if (!$this->helper('fi_checkout')->useOnlyDefaultCountry()): ?>
-                        <div class="f-left" data-action="<?php echo $this->getUrl('fi_order/checkout/regions')?>">
+                        <div class="f-left" data-action="<?php echo $this->getSecureUrl('fi_order/checkout/regions')?>">
                             <?php echo $this->getCountryBlock()->setName('user[address][country_id]')->getHtml() ?>
                             <p class="help"><?php echo $this->helper('checkout')->__('Country') ?>*</p>
                         </div>

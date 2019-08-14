@@ -478,4 +478,12 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $methods;
     }
+
+    public function getUpdateUrl() {
+      return $this->_getUrl('fi_order/checkout/update', array('_secure' => true));
+    }
+
+    public function getPlaceUrl() {
+      return $this->_getUrl('fi_order/checkout/place', array('_secure' => true));
+    }
 }
