@@ -7,6 +7,12 @@
  */
 -->
 <layout version="0.1.0">
+    <default>
+        <reference name="top.links">
+            <block type="fi_checkout/links" after="checkout_cart_link" />
+        </reference>
+    </default>
+
     <checkout_cart_index>
         <remove name="checkout.cart.top_methods" />
         <remove name="checkout.cart.methods.onepage" />
@@ -32,7 +38,7 @@
                     <action method="setMethodFormTemplate"><method>purchaseorder</method><template>payment/form/purchaseorder.phtml</template></action>
                 </block>
             </block>
-            
+
             <reference name="checkout.cart.coupon">
                 <block type="checkout/cart_crosssell" name="checkout.cart.crosssell" as="crosssell" template="checkout/cart/crosssell.phtml"/>
                 <action method="setTemplate"><template>freaks/checkout/coupon.phtml</template></action>
