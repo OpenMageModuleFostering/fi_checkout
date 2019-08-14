@@ -452,7 +452,7 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
         $session = Mage::getSingleton('customer/session');
         $order   = Mage::getModel('fi_checkout/order')->setSession($session);
         if ($order->getAddress()->isEmpty()) {
-            if ($session->isLoggedIn()) {
+            if ($session->isLoggedIn() && $session->getCustomer()->getPrimaryShippingAddress()) {
                 $order->setAddress($session->getCustomer()->getPrimaryShippingAddress()->getData());
             } else {
                 $order->setAddress($this->getDefaultShippingAddress());
