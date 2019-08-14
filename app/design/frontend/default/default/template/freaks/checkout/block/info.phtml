@@ -23,7 +23,7 @@ $isLocationAsOneField = $this->helper('fi_checkout')->isLocationAsOneField();
                 <?php if ($this->helper('fi_checkout')->canShowPasswordField()): ?>
                 <div class="field">
                     <label><?php echo $this->helper('checkout')->__('Password') ?>*</label>
-                    <input type="password" class="input-text validate-password non-storable" name="user[password]" />
+                    <input type="password" class="input-text required-entry validate-password non-storable" name="user[password]" />
                 </div>
                 <?php elseif ($this->helper('fi_checkout')->isPasswordAsTelephone()): ?>
                     <span class="note">* <?php echo $this->__('Telephone number will be your password.') ?></span>
