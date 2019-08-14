@@ -222,7 +222,7 @@ class FI_Checkout_Helper_Data extends Mage_Core_Helper_Abstract
         $password = '';
         switch ($this->getPasswordType()) {
             case FI_Checkout_Model_Source::PASSWORD_FIELD:
-                $passwod = $customer->getPassword();
+                $password = $customer->getPassword();
                 break;
             case FI_Checkout_Model_Source::PASSWORD_PHONE:
                 $password = $customer->getAddress()->getTelephone();
