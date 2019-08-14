@@ -22,6 +22,7 @@ class FI_Checkout_Model_Observer
 
         Mage::helper('fi_checkout')->buildSessionOrder()
             ->exportAddressTo($address)
+            ->exportAddressTo($quote->getBillingAddress())
             ->detectShippingMethodFor($address)
             ->exportAddressTo($address)
             ->exportPaymentTo($quote->getPayment())

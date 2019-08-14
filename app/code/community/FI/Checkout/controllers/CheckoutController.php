@@ -281,11 +281,8 @@ class FI_Checkout_CheckoutController extends Mage_Checkout_Controller_Action
             return $this;
         }
 
-        $quote = $this->getOnepage()->getQuote();
-        $sessionOrder = $this->_buildSessionOrder();
-        $sessionOrder->exportAddressTo($quote->getShippingAddress());
-        $sessionOrder->exportAddressTo($quote->getBillingAddress());
-        $sessionOrder->exportPaymentTo($quote->getPayment());
+        $this->_buildSessionOrder();
+        $this->getOnepage()->getQuote()->collectTotals();
 
         $blocks = array();
         $type = array_flip(explode(',', $request->getParam('type')));
@@ -306,7 +303,6 @@ class FI_Checkout_CheckoutController extends Mage_Checkout_Controller_Action
         }
 
         if (isset($type['totals'])) {
-            $quote->collectTotals();
             $blocks['totals'] = $this->getLayout()
                 ->getBlock('checkout.cart.totals')
                 ->toHtml();

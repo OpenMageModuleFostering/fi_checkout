@@ -145,13 +145,10 @@ class FI_Checkout_Model_Order
      */
     public function detectShippingMethodFor(Mage_Sales_Model_Quote_Address $address)
     {
-        $rates = $address->collectShippingRates()->getGroupedAllShippingRates();
-        if (is_array($rates) && count($rates) == 1 && count(reset($rates)) == 1) {
+        $rates = $address->getAllShippingRates();
+        if (count($rates) == 1) {
             $rate = reset($rates);
-            $rate = reset($rate);
-            if (is_object($rate)) {
-                $this->setShippingMethod($rate->getCode());
-            }
+            $this->setShippingMethod($rate->getCode());
         }
         return $this;
     }
