@@ -1,16 +1,19 @@
 {
-    "name": "OpenMageModuleFostering/FI_Checkout",
+    "name": "OpenMageModuleFostering\/FI_Checkout",
     "type": "magento-module",
     "license": "MIT-License",
     "homepage": "",
     "description": "0 Step Checkout provide One Page Checkout functionality for Magento, combine all the steps for checkout (including shopping cart) into one page only. It will made the checkout process much simpler. ",
     "authors": [
-    {
-        "name": "Sergiy Stotskiy",
-        "email": "sergiy.stotskiy@freaksidea.com"
-    }
-],
+        {
+            "name": "Sergiy Stotskiy",
+            "email": "sergiy.stotskiy@freaksidea.com"
+        }
+    ],
     "suggest": {
-        "magento-hackathon/magento-composer-installer": "*"
-    }
+        "magento-hackathon\/magento-composer-installer": "*"
+    },
+    "keywords": [
+        "openmage-module"
+    ]
 }
