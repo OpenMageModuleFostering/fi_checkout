@@ -1,5 +1,5 @@
 {
-    "name": "OpenMageModuleFostering\/FI_Checkout",
+    "name": "openmage-module-fostering\/fi_checkout",
     "type": "magento-module",
     "license": "MIT-License",
     "homepage": "",
